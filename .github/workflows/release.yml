@@ -1,0 +1,21 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup target add wasm32-unknown-unknown
+      - run: cargo build --release --locked --target wasm32-unknown-unknown
+      - name: Publish module.wasm and its SHA-256
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp target/wasm32-unknown-unknown/release/dreamport_module.wasm module.wasm
+          sha256sum module.wasm | cut -d' ' -f1 > module.wasm.sha256
+          gh release create "$GITHUB_REF_NAME" module.wasm module.wasm.sha256 module.json \
+            --title "$GITHUB_REF_NAME" --notes "module.wasm SHA-256: $(cat module.wasm.sha256)"
