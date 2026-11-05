@@ -87,6 +87,29 @@ path is the container's own, before any mount strip; `decoder` is `stored`, `zli
 An entry the reader can name but not locate is `{"path":"...","problem":"..."}`; the host refuses the
 container only if the pattern selects that entry.
 
+## Making a module, step by step
+
+1. **Fork this repository** on GitHub. An account (or organisation) can hold one fork of it, so a second module
+   of yours needs another owner.
+2. **Write your code** in `src/`: `decode` for a decoder, `dp_list` with `host::Container` for a reader. Keep
+   `rust-toolchain.toml` as it is, so everyone builds with the same compiler.
+3. **List what it offers** in `module.json`. Each name must be one Somnium knows:
+   - readers: `zip`, `file`, `unrealpak`, `iostore`, `bsa`, `scs`, `unityfs`, `dat2`, `mpq`, `n64`;
+   - decoders: `zlib`, `deflate`, `lz4`, `lz4block`, `oodle`.
+
+   A source may take a module only where its reader allows it: `unrealpak`, `iostore`, `file`, `bsa` and `unityfs` today.
+4. **Push a tag with your own name**, such as `v1-lz4`, never a bare `v1`. A fork inherits the base's tags, so `v1`
+   already exists in your fork and pushing it again builds nothing.
+5. **Take the SHA-256 from the release**, from `module.wasm.sha256` beside `module.wasm`, not from your own build.
+   GitHub builds on Linux; a build on Windows differs by a few bytes of file paths inside panic messages, so its
+   hash is not the one players download. Test the released file, not your local one.
+6. **Name it in a pattern** with that tag and that hash: `module=<names>:<you>/<repo>@<tag>#<sha256>`. One module
+   answers each name in a pattern; two forks can serve one source when they answer different names (for example
+   a `bsa` reader from one fork and `lz4` from another).
+
+**You are responsible for your module.** Somnium does not write, review or host modules: it only runs, isolated,
+the exact file a pattern names by its hash.
+
 ## Build
 
 ```bash
