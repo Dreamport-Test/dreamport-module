@@ -1,8 +1,11 @@
-//! A Dreamport module: bytes in, bytes out, no imports. See README.md for the ABI.
+//! A Dreamport module: bytes in, bytes out. See README.md for the ABI. The example offers a decoder and no reader,
+//! so it imports nothing; `host` is what a reader uses to read its container.
+
+pub mod host;
 
 use std::alloc::{alloc, dealloc, Layout};
 
-const ABI_VERSION: u32 = 1;
+const ABI_VERSION: u32 = 2;
 const ALIGN: usize = 16;
 const CORRUPT: i64 = -1;
 const BAD_ARGUMENTS: i64 = -5;
