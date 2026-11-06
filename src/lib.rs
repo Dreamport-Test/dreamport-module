@@ -5,7 +5,7 @@ pub mod host;
 
 use std::alloc::{alloc, dealloc, Layout};
 
-const ABI_VERSION: u32 = 3;
+const ABI_VERSION: u32 = 4;
 const ALIGN: usize = 16;
 const CORRUPT: i64 = -1;
 const UNSUPPORTED: i64 = -2;
@@ -63,4 +63,17 @@ fn decode(name: &[u8], input: &[u8], output: &mut [u8]) -> i64 {
     }
     output.copy_from_slice(input);
     output.len() as i64
+}
+
+const DESCRIPTION: &[u8] = br#"{"readers":[],"decoders":["example"]}"#;
+
+/// What this module answers, in its own words: the host routes these names to it and keeps no list of its own.
+#[no_mangle]
+pub extern "C" fn dp_describe() -> i64 {
+    DESCRIPTION.len() as i64
+}
+
+#[no_mangle]
+pub extern "C" fn dp_output() -> u32 {
+    DESCRIPTION.as_ptr() as usize as u32
 }
